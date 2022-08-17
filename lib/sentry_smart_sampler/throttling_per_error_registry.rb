@@ -35,8 +35,12 @@ class SentrySmartSampler
         @time_unit = time_unit
       end
 
-      def matches?(matchable)
-        matchable.is_a?(throttable)
+      def matches?(matchable_error)
+        if throttable.is_a?(Regexp) || throttable.respond_to?(:to_str)
+          matchable_error.message.scan(throttable).any?
+        else
+          matchable_error.is_a?(throttable)
+        end
       end
     end
   end

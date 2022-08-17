@@ -32,8 +32,12 @@ class SentrySmartSampler
         @sample_rate = sample_rate
       end
 
-      def matches?(matchable)
-        matchable.is_a?(samplable)
+      def matches?(matchable_error)
+        if samplable.is_a?(Regexp) || samplable.respond_to?(:to_str)
+          matchable_error.message.scan(samplable).any?
+        else
+          matchable_error.is_a?(samplable)
+        end
       end
     end
   end

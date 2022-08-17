@@ -31,6 +31,8 @@ Rails.application.config.to_prepare do
     config.declare_sampling_rate_per_error do
       declare Faraday::ClientError, sample_rate: 0.1
       declare ActiveRecord::RecordInvalid, sample_rate: 0.2
+      declare /message pattern as regexp/, sample_rate: 0.3
+      declare "message pattern as string", sample_rate: 0.4
     end
     
     config.default_throttling_errors_number_threshold = 100 # do not set it if you don't want errors to be throttled
@@ -39,6 +41,8 @@ Rails.application.config.to_prepare do
     
     config.declare_throttling_per_error do
       declare ActiveRecord::StatementInvalid, time_unit: :hour, threshold: 50
+      declare /message pattern as regexp/, time_unit: :hour, threshold: 100
+      declare "message pattern as string", time_unit: :hour, threshold: 200
     end
     
     config.after_throttling_threshold_reached = lambda do |event, hint|
