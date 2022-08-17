@@ -114,23 +114,23 @@ RSpec.describe SentrySmartSampler::RateLimit, :freeze_time do
     it { is_expected.to eq("sentry_smart_sampler/#{normalized_key}") }
   end
 
-  describe "#window", freeze_time: "2022-08-17 15:05:00" do
+  describe "#window", freeze_time: "2022-08-17T15:05:00Z" do
     subject(:window) { rate_limit.window }
 
-    describe "for current time", freeze_time: "2022-08-17 15:05:00" do
-      it { is_expected.to eq(461_317) }
+    describe "for current time", freeze_time: "2022-08-17T15:05:00Z" do
+      it { is_expected.to eq(461_319) }
     end
 
-    describe "30 minutes later", freeze_time: "2022-08-17 15:35:00" do
-      it { is_expected.to eq(461_317) }
+    describe "30 minutes later", freeze_time: "2022-08-17T15:35:00Z" do
+      it { is_expected.to eq(461_319) }
     end
 
-    describe "54 minutes later", freeze_time: "2022-08-17 15:59:00" do
-      it { is_expected.to eq(461_317) }
+    describe "54 minutes later", freeze_time: "2022-08-17T15:59:00Z" do
+      it { is_expected.to eq(461_319) }
     end
 
-    describe "55 minutes later", freeze_time: "2022-08-17 16:00:00" do
-      it { is_expected.to eq(461_318) }
+    describe "55 minutes later", freeze_time: "2022-08-17T16:00:00Z" do
+      it { is_expected.to eq(461_320) }
     end
   end
 end
