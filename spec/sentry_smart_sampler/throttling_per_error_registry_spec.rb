@@ -11,7 +11,7 @@ RSpec.describe SentrySmartSampler::ThrottlingPerErrorRegistry do
     let(:default_throttling_time_unit) { :minute }
 
     before do
-      registry.declare(error_class: RuntimeError, time_unit: :hour, threshold: 50)
+      registry.declare(RuntimeError, time_unit: :hour, threshold: 50)
     end
 
     context "when the error has a throttling config defined" do

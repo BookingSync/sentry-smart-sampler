@@ -29,8 +29,8 @@ Rails.application.config.to_prepare do
     config.logger = Rails.logger
     config.default_sample_rate = 0.5 # defaults to 1
     config.declare_sampling_rate_per_error do
-      declare error_class: Faraday::ClientError, sample_rate: 0.1
-      declare error_class: ActiveRecord::RecordInvalid, sample_rate: 0.2
+      declare Faraday::ClientError, sample_rate: 0.1
+      declare ActiveRecord::RecordInvalid, sample_rate: 0.2
     end
     
     config.default_throttling_errors_number_threshold = 100 # do not set it if you don't want errors to be throttled
@@ -38,7 +38,7 @@ Rails.application.config.to_prepare do
     # this config means that at most 100 errors of the same type can be sent withing a minute
     
     config.declare_throttling_per_error do
-      declare error_class: ActiveRecord::StatementInvalid, time_unit: :hour, threshold: 50
+      declare ActiveRecord::StatementInvalid, time_unit: :hour, threshold: 50
     end
     
     config.after_throttling_threshold_reached = lambda do |event, hint|

@@ -1,34 +1,40 @@
 # frozen_string_literal: true
 
-class SentrySmartSampler::SampleRatePerErrorRegistry
-  attr_reader :default_sample_rate, :registry
-  private     :default_sample_rate, :registry
+class SentrySmartSampler
+  class SampleRatePerErrorRegistry
+    attr_reader :default_sample_rate, :registry
+    private     :default_sample_rate, :registry
 
-  def initialize(default_sample_rate)
-    @default_sample_rate = default_sample_rate
-    @registry = []
-  end
+    def initialize(default_sample_rate)
+      @default_sample_rate = default_sample_rate
+      @registry = []
+    end
 
-  def declare(error_class:, sample_rate:)
-    registry << Registration.new(error_class: error_class, sample_rate: sample_rate)
-  end
+    def declare(samplable, sample_rate:)
+      registry << Registration.new(samplable: samplable, sample_rate: sample_rate)
+    end
 
-  def sample_rate_registration_for(error)
-    registry.find(-> { default_registration }) { |registration| error.is_a?(registration.error_class) }
-  end
+    def sample_rate_registration_for(error)
+      registry.find(-> { default_registration }) { |registration| registration.matches?(error) }
+    end
 
-  private
+    private
 
-  def default_registration
-    Registration.new(error_class: nil, sample_rate: default_sample_rate)
-  end
+    def default_registration
+      Registration.new(samplable: nil, sample_rate: default_sample_rate)
+    end
 
-  class Registration
-    attr_reader :error_class, :sample_rate
+    class Registration
+      attr_reader :samplable, :sample_rate
 
-    def initialize(error_class:, sample_rate:)
-      @error_class = error_class
-      @sample_rate = sample_rate
+      def initialize(samplable:, sample_rate:)
+        @samplable = samplable
+        @sample_rate = sample_rate
+      end
+
+      def matches?(matchable)
+        matchable.is_a?(samplable)
+      end
     end
   end
 end

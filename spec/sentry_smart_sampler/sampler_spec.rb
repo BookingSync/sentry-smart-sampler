@@ -18,7 +18,7 @@ RSpec.describe SentrySmartSampler::Sampler do
           config.default_sample_rate = 1
 
           config.declare_sampling_rate_per_error do
-            declare error_class: RuntimeError, sample_rate: 0.1
+            declare RuntimeError, sample_rate: 0.1
           end
         end
       end

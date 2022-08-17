@@ -10,7 +10,7 @@ RSpec.describe SentrySmartSampler::SampleRatePerErrorRegistry do
     let(:default_sample_rate) { 0.5 }
 
     before do
-      registry.declare(error_class: RuntimeError, sample_rate: 0.1)
+      registry.declare(RuntimeError, sample_rate: 0.1)
     end
 
     context "when the error has a sampling rate defined" do

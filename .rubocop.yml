@@ -72,9 +72,7 @@ Style/Alias:
   EnforcedStyle: prefer_alias_method
 
 Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
-  Exclude:
-    - 'lib/sentry/smart/sampler/version.rb'
+  EnforcedStyle: nested
 
 Style/CommandLiteral:
   EnforcedStyle: percent_x
