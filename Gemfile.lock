@@ -4,6 +4,7 @@ PATH
     sentry-smart-sampler (0.1.0)
       activesupport (>= 5)
       sentry-ruby (~> 5)
+      zeitwerk
 
 GEM
   remote: https://rubygems.org/
@@ -67,6 +68,7 @@ GEM
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.2.0)
+    zeitwerk (2.6.0)
 
 PLATFORMS
   x86_64-darwin-18

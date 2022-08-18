@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-require "sentry/smart/sampler/version"
 require "active_support"
 require "active_support/core_ext"
-require "sentry_smart_sampler/configuration"
-require "sentry_smart_sampler/rate_limit"
-require "sentry_smart_sampler/sampler"
-require "sentry_smart_sampler/sample_rate_per_error_registry"
-require "sentry_smart_sampler/throttling_per_error_registry"
-require "sentry_smart_sampler/throttling_threshold_reached_definition"
+require "zeitwerk"
+
+loader = Zeitwerk::Loader.for_gem
+loader.ignore("#{__dir__}/sentry-smart-sampler.rb")
+loader.setup
 
 class SentrySmartSampler
   def self.configuration

@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport", ">= 5"
   spec.add_dependency "sentry-ruby", "~> 5"
+  spec.add_dependency "zeitwerk"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html
