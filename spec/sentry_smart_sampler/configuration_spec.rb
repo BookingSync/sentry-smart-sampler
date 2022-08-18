@@ -196,4 +196,24 @@ RSpec.describe SentrySmartSampler::Configuration do
 
     it { is_expected.to be_a(SentrySmartSampler::ThrottlingPerErrorRegistry) }
   end
+
+  describe "throttling_threshold_reached_definition" do
+    subject(:throttling_threshold_reached_definition) { configuration.throttling_threshold_reached_definition }
+
+    let(:configuration) { described_class.new }
+
+    context "when not set" do
+      it { is_expected.to be_a(SentrySmartSampler::ThrottlingThresholdReachedDefinition) }
+    end
+
+    context "when set" do
+      let(:custom_throttling_threshold_reached_definition) { double }
+
+      before do
+        configuration.throttling_threshold_reached_definition = custom_throttling_threshold_reached_definition
+      end
+
+      it { is_expected.to eq custom_throttling_threshold_reached_definition }
+    end
+  end
 end

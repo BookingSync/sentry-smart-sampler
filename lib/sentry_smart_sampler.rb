@@ -8,6 +8,7 @@ require "sentry_smart_sampler/rate_limit"
 require "sentry_smart_sampler/sampler"
 require "sentry_smart_sampler/sample_rate_per_error_registry"
 require "sentry_smart_sampler/throttling_per_error_registry"
+require "sentry_smart_sampler/throttling_threshold_reached_definition"
 
 class SentrySmartSampler
   def self.configuration

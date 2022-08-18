@@ -71,12 +71,35 @@ RSpec.describe SentrySmartSampler::Sampler do
         end.new
       end
 
+      context "when caling :throttling_threshold_reached_definition" do
+        let(:throttling_threshold_reached_definition) do
+          SentrySmartSampler.configuration.throttling_threshold_reached_definition
+        end
+
+        before do
+          allow(SentrySmartSampler.configuration).to receive(:throttling_threshold_reached_definition)
+            .and_return(throttling_threshold_reached_definition)
+          allow(throttling_threshold_reached_definition).to receive(:reached?).and_call_original
+        end
+
+        it "calls the #reached? wit the right arguments" do
+          call
+
+          expect(throttling_threshold_reached_definition).to have_received(:reached?).with(
+            an_instance_of(SentrySmartSampler::RateLimit),
+            an_instance_of(SentrySmartSampler::ThrottlingPerErrorRegistry::Registration),
+            error
+          )
+        end
+      end
+
       context "when throttled" do
         before do
           default_throttling_errors_number_threshold.times { rate_limit.increase }
         end
 
         it { is_expected.to be_nil }
+        it { is_expected_block.to change { rate_limit.count }.by(1) }
       end
 
       context "when not throttled" do

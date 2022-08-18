@@ -110,3 +110,6 @@ Naming/FileName:
   Exclude:
     - 'lib/sentry-smart-sampler.rb'
 
+RSpec/ExampleLength:
+  Max: 7
+

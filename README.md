@@ -49,6 +49,13 @@ Rails.application.config.to_prepare do
       # do something when the threshold is reached, e.g. send a Slack notification. This callback will be fired at most once, when the threshold is reached. Not required
       # when not provided, the error will be logged using logger
     end
+    
+    # not-required and not recommended to set unless you really know what you are doing
+    # the default definition of of reaching threshold is when the number of errors reaches the provided threshold for a given error within a given time unit
+    # if you really want to customize it (because you want e.g. to have another notification delivered from `after_throttling_threshold_reached` when you reach 10x of the threshold
+    # you need create an object that responds to `reached?` method taking 3 arguments: rate_limit, throttling_registration, error
+    # check `SentrySmartSampler::ThrottlingThresholdReachedDefinition` for more details
+    config.throttling_threshold_reached_definition = SomeCustomClassImplementingThrottlingThresholdReachedDefinition.new 
   end
 end
 

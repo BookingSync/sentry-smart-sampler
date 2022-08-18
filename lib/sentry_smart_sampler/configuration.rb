@@ -4,7 +4,7 @@ class SentrySmartSampler
   class Configuration
     attr_accessor :cache_storage, :logger, :default_throttling_errors_number_threshold
     attr_reader :default_throttling_time_unit
-    attr_writer :default_sample_rate, :after_throttling_threshold_reached
+    attr_writer :default_sample_rate, :after_throttling_threshold_reached, :throttling_threshold_reached_definition
 
     TIME_UNITS = %i[second minute hour day].freeze
     private_constant :TIME_UNITS
@@ -38,6 +38,10 @@ class SentrySmartSampler
     def throttling_per_error_registry
       @throttling_per_error_registry ||= ThrottlingPerErrorRegistry.new(default_throttling_errors_number_threshold,
         default_throttling_time_unit)
+    end
+
+    def throttling_threshold_reached_definition
+      @throttling_threshold_reached_definition || ThrottlingThresholdReachedDefinition.new
     end
 
     private

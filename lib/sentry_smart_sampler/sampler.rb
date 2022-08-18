@@ -2,14 +2,17 @@
 
 class SentrySmartSampler
   class Sampler
-    attr_reader :registry, :random_generator, :cache_storage, :after_throttling_threshold_reached
-    private     :registry, :random_generator, :cache_storage, :after_throttling_threshold_reached
+    attr_reader :registry, :random_generator, :cache_storage, :after_throttling_threshold_reached,
+      :throttling_threshold_reached_definition
+    private     :registry, :random_generator, :cache_storage, :after_throttling_threshold_reached,
+      :throttling_threshold_reached_definition
 
     def initialize(registry, random_generator: Random, configuration: SentrySmartSampler.configuration)
       @registry = registry
       @random_generator = random_generator
       @cache_storage = configuration.cache_storage
       @after_throttling_threshold_reached = configuration.after_throttling_threshold_reached
+      @throttling_threshold_reached_definition = configuration.throttling_threshold_reached_definition
     end
 
     def call(event, hint)
@@ -18,10 +21,12 @@ class SentrySmartSampler
 
       if apply_throttling?(throttling_registration)
         rate_limit = initialize_rate_limit(throttling_registration, error)
-        return if rate_limit.throttled?
-
+        already_throttled = rate_limit.throttled?
         rate_limit.increase
-        after_throttling_threshold_reached.call(event, hint) if rate_limit.throttled?
+        after_throttling_threshold_reached.call(event, hint) if throttling_threshold_reached_definition.reached?(
+          rate_limit, throttling_registration, error
+        )
+        return if already_throttled
       end
 
       sample(event, error)
@@ -39,6 +44,8 @@ class SentrySmartSampler
         interval: 1.public_send(throttling_registration.time_unit),
         cache: cache_storage)
     end
+
+    def threshold_reached?(rate_limit, throttling_registration, error); end
 
     def sample(event, error)
       event if random_generator.rand <= registry.sample_rate_registration_for(error).sample_rate
