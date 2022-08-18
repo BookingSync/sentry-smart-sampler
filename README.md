@@ -1,8 +1,6 @@
-# Sentry::Smart::Sampler
+# SentrySmartSampler
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sentry/smart/sampler`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Smart sampler for `sentry-ruby` with rate limiting/throttling and sampling specific errors.
 
 ## Installation
 
@@ -22,7 +20,53 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Inside Sentry initializer:
+
+``` rb
+Rails.application.config.to_prepare do
+  SentrySmartSampler.configure do |config|
+    config.cache_storage = Rails.cache # ideally a Rails cache backed by Redis. But could be anything responding to the same interface
+    config.logger = Rails.logger
+    config.default_sample_rate = 0.5 # defaults to 1
+    config.declare_sampling_rate_per_error do
+      declare Faraday::ClientError, sample_rate: 0.1
+      declare ActiveRecord::RecordInvalid, sample_rate: 0.2
+      declare /message pattern as regexp/, sample_rate: 0.3
+      declare "message pattern as string", sample_rate: 0.4
+    end
+    
+    config.default_throttling_errors_number_threshold = 100 # do not set it if you don't want errors to be throttled
+    config.default_throttling_time_unit = :minute  # do not set it if you don't want errors to be throttled, other options: [:second, :minute, :hour, :day]
+    # this config means that at most 100 errors of the same type can be sent withing a minute
+    
+    config.declare_throttling_per_error do
+      declare ActiveRecord::StatementInvalid, time_unit: :hour, threshold: 50
+      declare /message pattern as regexp/, time_unit: :hour, threshold: 100
+      declare "message pattern as string", time_unit: :hour, threshold: 200
+    end
+    
+    config.after_throttling_threshold_reached = lambda do |event, hint|
+      # do something when the threshold is reached, e.g. send a Slack notification. This callback will be fired at most once, when the threshold is reached. Not required
+      # when not provided, the error will be logged using logger
+    end
+    
+    # not-required and not recommended to set unless you really know what you are doing
+    # the default definition of of reaching threshold is when the number of errors reaches the provided threshold for a given error within a given time unit
+    # if you really want to customize it (because you want e.g. to have another notification delivered from `after_throttling_threshold_reached` when you reach 10x of the threshold
+    # you need create an object that responds to `reached?` method taking 3 arguments: rate_limit, throttling_registration, error
+    # check `SentrySmartSampler::ThrottlingThresholdReachedDefinition` for more details
+    config.throttling_threshold_reached_definition = SomeCustomClassImplementingThrottlingThresholdReachedDefinition.new 
+  end
+end
+
+Sentry.init do |config| 
+  config.dsn = ENV["SENTRY_DSN"]
+  
+  config.before_send = lambda do |event, hint|
+    SentrySmartSampler.call(event, hint) # returns event or nil if the event should be dropped
+  end
+end
+```
 
 ## Development
 
